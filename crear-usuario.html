@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzasSG - Crear Usuario</title>
+    <link rel="stylesheet" href="../Componentes/css/Crear_user.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Crear Usuario</h1>
+            <p>Registro en FinanzasSG</p>
+        </div>
+
+        <div class="register-form">
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="registerForm">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="nombre">Nombre Completo</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuario">Usuario</label>
+                        <input type="text" id="usuario" name="usuario" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contraseña">Contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="contraseña" name="contraseña" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('contraseña')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-requirements">
+                            <strong>Requisitos de contraseña:</strong>
+                            <ul>
+                                <li>Mínimo 6 caracteres</li>
+                                <li>Se recomienda usar letras y números</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmarContraseña">Confirmar Contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="confirmarContraseña" name="confirmarContraseña" required>
+                            <button type="button" class="password-toggle"
+                                onclick="togglePassword('confirmarContraseña')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ocupacionPre">Ocupación en el Pre</label>
+                        <select id="ocupacionPre" name="ocupacionPre" required>
+                            <option value="">Seleccionar ocupación</option>
+                            <option value="JEFE DE AREA">JEFE DE AREA</option>
+                            <option value="PROFESOR COMPLEMENTARIO">PROFESOR COMPLEMENTARIO</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group half-width">
+                        <label for="nombreQuienRecibe">Nombre de Quien Recibe</label>
+                        <input type="text" id="nombreQuienRecibe" name="nombreQuienRecibe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoBanco">Tipo de Banco</label>
+                        <select id="tipoBanco" name="tipoBanco" required>
+                            <option value="">Seleccionar banco</option>
+                            <option value="NEQUI">NEQUI</option>
+                            <option value="DAVIPLATA">DAVIPLATA</option>
+                            <option value="BANCOLOMBIA">BANCOLOMBIA</option>
+                            <option value="BANCO DE BOGOTÁ">BANCO DE BOGOTÁ</option>
+                            <option value="BANCO POPULAR">BANCO POPULAR</option>
+                            <option value="BBVA COLOMBIA">BBVA COLOMBIA</option>
+                            <option value="BANCO DAVIVIENDA">BANCO DAVIVIENDA</option>
+                            <option value="BANCO CAJA SOCIAL">BANCO CAJA SOCIAL</option>
+                            <option value="BANCO AGRARIO">BANCO AGRARIO</option>
+                            <option value="BANCO AV VILLAS">BANCO AV VILLAS</option>
+                            <option value="BANCO FALABELLA">BANCO FALABELLA</option>
+                            <option value="BANCO PICHINCHA">BANCO PICHINCHA</option>
+                            <option value="SCOTIABANK COLPATRIA">SCOTIABANK COLPATRIA</option>
+                            <option value="EFECTIVO">EFECTIVO</option>
+                            <option value="OTRO">OTRO</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoId">Tipo de Documento</label>
+                        <select id="tipoId" name="tipoId" required>
+                            <option value="">Seleccionar tipo de documento</option>
+                            <option value="CÉDULA DE CIUDADANÍA">CÉDULA DE CIUDADANÍA</option>
+                            <option value="CÉDULA DE EXTRANJERÍA">CÉDULA DE EXTRANJERÍA</option>
+                            <option value="TARJETA DE IDENTIDAD">TARJETA DE IDENTIDAD</option>
+                            <option value="PASAPORTE">PASAPORTE</option>
+                            <option value="REGISTRO CIVIL">REGISTRO CIVIL</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroId">Número de Documento</label>
+                        <input type="text" id="numeroId" name="numeroId" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroCuenta">Número de Cuenta</label>
+                        <input type="text" id="numeroCuenta" name="numeroCuenta" required>
+                    </div>
+
+                    <div class="form-group half-width">
+                        <label for="nombreCuenta">Nombre de Cuenta</label>
+                        <input type="text" id="nombreCuenta" name="nombreCuenta" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Roles del Usuario</label>
+                        <div class="roles-container">
+                            <label><input type="checkbox" name="roles" value="PROFESOR"> PROFESOR</label>
+                            <label><input type="checkbox" name="roles" value="ADMINISTRADOR"> ADMINISTRADOR</label>
+                            <label><input type="checkbox" name="roles" value="SUPER USUARIO"> SUPER USUARIO</label>
+                        </div>
+                        <small class="form-help">Selecciona uno o más roles para el usuario</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="esProfesor" name="esProfesor">
+                            ¿Es Profesor?
+                        </label>
+                    </div>
+
+                    <div id="materiasSection" class="form-group full-width" style="display: none;">
+                        <label>Materias que imparte:</label>
+                        <div class="materias-container">
+                            <label><input type="checkbox" name="materias" value="MTS"> MTS (Matemáticas)</label>
+                            <label><input type="checkbox" name="materias" value="LC"> LC (Lectura y Comprensión)</label>
+                            <label><input type="checkbox" name="materias" value="CS"> CS (Ciencias Sociales)</label>
+                            <label><input type="checkbox" name="materias" value="ING"> ING (Inglés)</label>
+                            <label><input type="checkbox" name="materias" value="CN"> CN (Ciencias Naturales)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="register-btn">Crear Usuario</button>
+            </form>
+
+            <div class="back-link">
+                <a href="index.html">← Volver al Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Scripts de la aplicación -->
+    <script src="Componentes/js/config.js"></script>
+    <script src="Componentes/js/crear_user.js"></script>
+    
+    <!-- Inicializar Firebase después de cargar los scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initializeFirebase === 'function') {
+                initializeFirebase();
+            }
+        });
+    </script>
+</body>
+
+</html>

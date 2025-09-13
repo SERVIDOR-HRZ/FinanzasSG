@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzasSG - Gestión de Horarios</title>
+    <link rel="stylesheet" href="../Componentes/css/horarios.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>FinanzasSG - Horarios</h1>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, <span id="nombreUsuario">Usuario</span></span>
+                <a href="Panel_1.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al Panel
+                </a>
+                <a href="#" class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de navegación de vistas -->
+    <nav class="view-nav">
+        <div class="nav-content">
+            <div class="view-buttons">
+                <button id="btnVistaTabla" class="view-btn active" onclick="cambiarVista('tabla')">
+                    <i class="fas fa-table"></i> Vista Tabla
+                </button>
+                <button id="btnVistaCalendario" class="view-btn" onclick="cambiarVista('calendario')">
+                    <i class="fas fa-calendar"></i> Vista Calendario
+                </button>
+                <button id="btnVistaDia" class="view-btn" onclick="cambiarVista('dia')">
+                    <i class="fas fa-calendar-day"></i> Vista por Día
+                </button>
+            </div>
+            <div class="controls">
+                <select id="filtroMateria" onchange="filtrarPorMateria()">
+                    <option value="">Todas las Materias</option>
+                    <!-- Las materias se cargarán dinámicamente según el usuario -->
+                </select>
+                <button class="btn btn-info" onclick="abrirModalComprobantes()">
+                    <i class="fas fa-receipt"></i> Ver Comprobantes de Pago
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Vista de Tabla -->
+        <div id="vistaTabla" class="vista-container active">
+            <div class="tabla-horarios-container">
+                <div class="semana-navigation">
+                    <button class="nav-semana" onclick="cambiarSemana(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h2 id="tituloSemana">Semana 11 (30 AL 6 JULIO)</h2>
+                    <button class="nav-semana" onclick="cambiarSemana(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="tabla-wrapper">
+                    <table class="tabla-horarios">
+                        <thead>
+                            <tr>
+                                <th class="col-dia">Días de la semana</th>
+                                <th class="col-horas">Cantidad horas</th>
+                                <th class="col-tipologia">Tipología de la clase</th>
+                                <th class="col-unidad">Unidad de la clase (Teoría)</th>
+                                <th class="col-tema">Tema/Tipología de la clase</th>
+                                <th class="col-tutor">Tutor encargado</th>
+                                <th class="col-fecha">Fecha de la clase</th>
+                                <th class="col-pago">¿Se pagó?</th>
+                                <th class="col-dio-clase">¿Se dio la clase?</th>
+                                <th class="col-acciones">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaHorariosBody">
+                            <!-- Los horarios se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Calendario -->
+        <div id="vistaCalendario" class="vista-container">
+            <div class="calendario-layout">
+                <div class="calendario-container">
+                    <div class="calendario-header">
+                        <button class="nav-mes" onclick="cambiarMes(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h2 id="tituloMes">Julio 2025</h2>
+                        <button class="nav-mes" onclick="cambiarMes(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="calendario-grid">
+                        <div class="dia-semana">Lun</div>
+                        <div class="dia-semana">Mar</div>
+                        <div class="dia-semana">Mié</div>
+                        <div class="dia-semana">Jue</div>
+                        <div class="dia-semana">Vie</div>
+                        <div class="dia-semana">Sáb</div>
+                        <div class="dia-semana">Dom</div>
+                        <!-- Los días del calendario se generarán dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- Panel lateral de clases del día -->
+                <div id="panelClasesDia" class="panel-clases-dia">
+                    <div class="panel-header">
+                        <h3 id="tituloDiaSeleccionado">Selecciona un día</h3>
+                        <button id="btnNuevoHorarioDia" class="btn btn-primary" onclick="crearHorarioDesdeCalendario(fechaSeleccionadaCalendario)" style="display: none;">
+                            <i class="fas fa-plus"></i> Nuevo Horario
+                        </button>
+                    </div>
+                    <div id="contenidoClasesDia" class="contenido-clases-dia">
+                        <div class="sin-clases-seleccion">
+                            <i class="fas fa-calendar-day"></i>
+                            <h4>Selecciona un día del calendario</h4>
+                            <p>Haz clic en cualquier día para ver las clases programadas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista por Día -->
+        <div id="vistaDia" class="vista-container">
+            <div class="vista-dia-container">
+                <div class="vista-dia-header">
+                    <div class="filtros-dia">
+                        <div class="filtro-fecha">
+                            <label for="fechaSeleccionada">Seleccionar Fecha:</label>
+                            <input type="date" id="fechaSeleccionada" onchange="cargarVistaDia()">
+                        </div>
+                        <div class="filtro-dia-semana">
+                            <label for="diaSemanaSeleccionado">O seleccionar día de la semana:</label>
+                            <select id="diaSemanaSeleccionado" onchange="seleccionarDiaSemana()">
+                                <option value="">Seleccionar día</option>
+                                <option value="Lunes">Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Miércoles">Miércoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                                <option value="Sábado">Sábado</option>
+                                <option value="Domingo">Domingo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="resumen-dia">
+                        <h2 id="tituloDia">Selecciona una fecha</h2>
+                        <div class="estadisticas-dia">
+                            <div class="stat-item">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span id="totalClases">0</span>
+                                <span>Clases</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="totalHoras">0</span>
+                                <span>Horas</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span id="clasesDadas">0</span>
+                                <span>Dadas</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span id="clasesPagadas">0</span>
+                                <span>Pagadas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="clases-dia-container" id="clasesDiaContainer">
+                    <div class="sin-clases">
+                        <i class="fas fa-calendar-day"></i>
+                        <h3>Selecciona una fecha para ver las clases</h3>
+                        <p>Usa el selector de fecha o elige un día de la semana para ver las clases programadas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Nuevo/Editar Horario -->
+    <div id="modalHorario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModal">Nuevo Horario</h3>
+                <button class="close-btn" onclick="cerrarModalHorario()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formHorario" class="modal-body">
+                <div class="form-group">
+                    <label for="diaSemana">Día de la Semana:</label>
+                    <select id="diaSemana" required>
+                        <option value="">Seleccionar día</option>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidadHoras">Cantidad de Horas:</label>
+                    <input type="number" id="cantidadHoras" min="1" max="8" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipologiaClase">Tipología de la Clase:</label>
+                    <select id="tipologiaClase" required>
+                        <option value="">Seleccionar tipología</option>
+                        <option value="Práctica (Libre)">Práctica (Libre)</option>
+                        <option value="Práctica (Simulacro)">Práctica (Simulacro)</option>
+                        <option value="Teórica (Obligatorio)">Teórica (Obligatorio)</option>
+                        <option value="Teórica-Práctica (Libre)">Teórica-Práctica (Libre)</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="unidadClase">Unidad de la Clase:</label>
+                    <input type="text" id="unidadClase" placeholder="Ej: Taller 3, TEORICA" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="temaClase">Tema/Tipología de la Clase:</label>
+                    <input type="text" id="temaClase" placeholder="Ej: JERARQUIA OPERACIONES" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tutorEncargado">Tutor Encargado:</label>
+                    <select id="tutorEncargado" required>
+                        <option value="">Seleccionar tutor</option>
+                        <!-- Los tutores se cargarán dinámicamente según el rol y materia -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fechaClase">Fecha de la Clase:</label>
+                    <input type="date" id="fechaClase" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="materia">Materia:</label>
+                    <select id="materia" required>
+                        <option value="">Seleccionar materia</option>
+                        <!-- Las materias se cargarán dinámicamente según el usuario -->
+                    </select>
+                </div>
+
+             
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalHorario()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay del modal -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <!-- Modal para Comprobantes de Pago -->
+    <div id="modalComprobantes" class="modal modal-comprobantes">
+        <div class="modal-content modal-comprobantes-content">
+            <div class="modal-header">
+                <h3>Comprobantes de Pago por Semana</h3>
+                <button class="close-btn" onclick="cerrarModalComprobantes()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="filtros-comprobantes">
+                    <div class="filtro-mes">
+                        <label for="mesComprobantes">Seleccionar Mes:</label>
+                        <select id="mesComprobantes" onchange="cargarComprobantesPorMes()">
+                            <option value="">Seleccionar mes</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="listaComprobantes" class="comprobantes-lista">
+                    <div class="sin-comprobantes">
+                        <i class="fas fa-receipt"></i>
+                        <h4>Selecciona un mes para ver los comprobantes</h4>
+                        <p>Los comprobantes se organizan por semana dentro del mes seleccionado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <script src="../Componentes/js/config.js"></script>
+    <script>
+        // Inicializar Firebase cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+    </script>
+    <script src="../Componentes/js/horarios.js"></script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzasSG - Gestión de Ingresos</title>
+    <link rel="stylesheet" href="../Componentes/css/gestion-ingresos.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>FinanzasSG - Gestión de Ingresos</h1>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, <span id="nombreUsuario">Usuario</span></span>
+                <a href="CuentasPorPagar.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver a Cuentas por Pagar
+                </a>
+                <a href="Panel_1.html" class="btn-back">
+                    <i class="fas fa-home"></i> Panel Principal
+                </a>
+                <a href="#" class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de herramientas -->
+    <nav class="toolbar">
+        <div class="toolbar-content">
+            <div class="toolbar-title">
+                <h2>Resumen de Ingresos y Gastos</h2>
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-primary" onclick="abrirModalIngreso()">
+                    <i class="fas fa-plus"></i> Nuevo Ingreso
+                </button>
+                <button class="btn btn-outline" onclick="abrirModalGasto()">
+                    <i class="fas fa-minus"></i> Nuevo Gasto
+                </button>
+                <button class="btn btn-success" onclick="abrirGestionBancoDinero()">
+                    <i class="fas fa-university"></i> Gestionar Bancos
+                </button>
+                <button class="btn btn-info" onclick="exportarReporte()">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Filtros de fecha -->
+        <div class="filtros-fecha-container">
+            <div class="filtros-fecha">
+                <div class="filter-group">
+                    <label for="fechaInicio">Fecha Inicio:</label>
+                    <input type="date" id="fechaInicio" onchange="aplicarFiltrosFecha()">
+                </div>
+                <div class="filter-group">
+                    <label for="fechaFin">Fecha Fin:</label>
+                    <input type="date" id="fechaFin" onchange="aplicarFiltrosFecha()">
+                </div>
+                <button class="btn btn-outline" onclick="limpiarFiltrosFecha()">
+                    <i class="fas fa-eraser"></i> Limpiar Filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales -->
+        <div class="estadisticas-generales">
+            <div class="stat-card ingresos">
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalIngresos">$0</div>
+                    <div class="stat-label">Total Ingresos</div>
+                    <div class="stat-count" id="cantidadIngresos">0 transacciones</div>
+                </div>
+            </div>
+            <div class="stat-card gastos">
+                <div class="stat-icon">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalGastos">$0</div>
+                    <div class="stat-label">Total Gastos</div>
+                    <div class="stat-count" id="cantidadGastos">0 transacciones</div>
+                </div>
+            </div>
+            <div class="stat-card balance">
+                <div class="stat-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="balanceNeto">$0</div>
+                    <div class="stat-label">Balance Neto</div>
+                    <div class="stat-trend" id="tendenciaBalance">Equilibrado</div>
+                </div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalDineroGeneral">$0</div>
+                    <div class="stat-label">Total en Todas las Cuentas</div>
+                    <div class="stat-count" id="cantidadCuentas">0 cuentas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen por Banco -->
+        <div class="resumen-bancos-container">
+            <div class="section-header">
+                <h3>Resumen por Banco</h3>
+                <button class="btn btn-secondary" onclick="actualizarResumen()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+            <div class="resumen-bancos-grid" id="resumenBancosGrid">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Historial de Movimientos -->
+        <div class="historial-container">
+            <div class="section-header">
+                <h3>Historial de Movimientos</h3>
+                <div class="historial-tabs">
+                    <button class="tab-btn active" onclick="cambiarTab('todos')">Todos</button>
+                    <button class="tab-btn" onclick="cambiarTab('ingresos')">Ingresos</button>
+                    <button class="tab-btn" onclick="cambiarTab('gastos')">Gastos</button>
+                </div>
+            </div>
+            <div class="historial-content">
+                <div class="tabla-wrapper">
+                    <table class="tabla-movimientos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Banco</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaMovimientosBody">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Nuevo Gasto -->
+    <div id="modalGasto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalGasto">Nuevo Gasto</h3>
+                <button class="close-btn" onclick="cerrarModalGasto()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formGasto" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bancoOrigen">Banco Origen:</label>
+                        <select id="bancoOrigen" required>
+                            <option value="">Seleccionar banco</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="montoGasto">Monto:</label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="montoGasto" min="0" step="1000" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipoGasto">Tipo de Gasto:</label>
+                        <select id="tipoGasto" required>
+                            <option value="manual">Manual</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="retiro">Retiro</option>
+                            <option value="pago_servicio">Pago de Servicio</option>
+                            <option value="compra">Compra</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoriaGasto">Categoría:</label>
+                        <select id="categoriaGasto" required>
+                            <option value="general">General</option>
+                            <option value="operativo">Operativo</option>
+                            <option value="administrativo">Administrativo</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="suministros">Suministros</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaGasto">Fecha del Gasto:</label>
+                        <input type="datetime-local" id="fechaGasto" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcionGasto">Descripción:</label>
+                    <textarea id="descripcionGasto" rows="3" placeholder="Descripción del gasto..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="comprobanteGasto">Comprobante (Opcional):</label>
+                    <input type="file" id="comprobanteGasto" accept="image/*" onchange="manejarComprobanteGasto(this)">
+                    <small class="archivo-info">Sube una imagen del comprobante (máximo 5MB)</small>
+                </div>
+
+                <div id="previewComprobanteGasto" class="preview-comprobante" style="display: none;">
+                    <h5>Vista previa:</h5>
+                    <img src="" alt="Preview del comprobante" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalGasto()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Registrar Gasto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Ingreso -->
+    <div id="modalIngreso" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalIngreso">Nuevo Ingreso</h3>
+                <button class="close-btn" onclick="cerrarModalIngreso()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formIngreso" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bancoDestino">Banco Destino:</label>
+                        <select id="bancoDestino" required>
+                            <option value="">Seleccionar banco</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="montoIngreso">Monto:</label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="montoIngreso" min="0" step="1000" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipoIngreso">Tipo de Ingreso:</label>
+                        <select id="tipoIngreso" required>
+                            <option value="manual">Manual</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="deposito">Depósito</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoriaIngreso">Categoría:</label>
+                        <select id="categoriaIngreso" required>
+                            <option value="general">General</option>
+                            <option value="salario">Salario</option>
+                            <option value="venta">Venta</option>
+                            <option value="servicio">Servicio</option>
+                            <option value="prestamo">Préstamo</option>
+                            <option value="inversion">Inversión</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaIngreso">Fecha del Ingreso:</label>
+                        <input type="datetime-local" id="fechaIngreso" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcionIngreso">Descripción:</label>
+                    <textarea id="descripcionIngreso" rows="3" placeholder="Descripción del ingreso..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="comprobanteIngreso">Comprobante (Opcional):</label>
+                    <input type="file" id="comprobanteIngreso" accept="image/*" onchange="manejarComprobanteIngreso(this)">
+                    <small class="archivo-info">Sube una imagen del comprobante (máximo 5MB)</small>
+                </div>
+
+                <div id="previewComprobanteIngreso" class="preview-comprobante" style="display: none;">
+                    <h5>Vista previa:</h5>
+                    <img src="" alt="Preview del comprobante" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalIngreso()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Registrar Ingreso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Gestión de Banco de Dinero -->
+    <div id="modalBancoDinero" class="modal">
+        <div class="modal-content modal-banco">
+            <div class="modal-header">
+                <h3>Gestión de Banco de Dinero</h3>
+                <button class="close-btn" onclick="cerrarModalBancoDinero()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formBancoDinero" class="modal-body" onsubmit="event.preventDefault(); guardarBancoDinero();">
+                <div class="info-banco">
+                    <p><i class="fas fa-info-circle"></i> Configura el dinero disponible en cada banco para realizar pagos.</p>
+                </div>
+                <div id="formularioBancoDinero">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalBancoDinero()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Detalles de Movimiento -->
+    <div id="modalDetalleMovimiento" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles del Movimiento</h3>
+                <button class="close-btn" onclick="cerrarModalDetalleMovimiento()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="contenidoDetalleMovimiento">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalDetalleMovimiento()">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Exportar Reporte -->
+    <div id="modalExportar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Exportar Reporte</h3>
+                <button class="close-btn" onclick="cerrarModalExportar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-banco">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Selecciona qué tipo de datos deseas exportar. El archivo se descargará en formato Excel (.xlsx).</p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tipo de datos a exportar:</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="exportarTodos" name="tipoExportacion" value="todos" checked>
+                            <label for="exportarTodos">
+                                <i class="fas fa-list"></i>
+                                <div>
+                                    <strong>Todos los movimientos</strong>
+                                    <span>Exportar tanto ingresos como gastos</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="exportarIngresos" name="tipoExportacion" value="ingresos">
+                            <label for="exportarIngresos">
+                                <i class="fas fa-arrow-up" style="color: #16a34a;"></i>
+                                <div>
+                                    <strong>Solo Ingresos</strong>
+                                    <span>Exportar únicamente los ingresos registrados</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="exportarGastos" name="tipoExportacion" value="gastos">
+                            <label for="exportarGastos">
+                                <i class="fas fa-arrow-down" style="color: #ef4444;"></i>
+                                <div>
+                                    <strong>Solo Gastos</strong>
+                                    <span>Exportar únicamente los gastos registrados</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-info">
+                    <p><strong>Nota:</strong> Si tienes filtros de fecha aplicados, se respetarán en la exportación.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalExportar()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="ejecutarExportacion()">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay del modal -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <!-- Scripts -->
+    <!-- SheetJS para exportar Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <script src="../Componentes/js/config.js"></script>
+    <script>
+        // Inicializar Firebase cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+    </script>
+    <script src="../Componentes/js/gestion-ingresos.js"></script>
+    <script src="../Componentes/js/pagos-sistema.js"></script>
+</body>
+</html>
+

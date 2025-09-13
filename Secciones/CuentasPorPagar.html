@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzasSG - Cuentas por Pagar</title>
+    <link rel="stylesheet" href="../Componentes/css/cuentas-pagar.css">
+    <link rel="stylesheet" href="../Componentes/css/pagos-sistema.css">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>FinanzasSG - Cuentas por Pagar</h1>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text">Bienvenido, <span id="nombreUsuario">Usuario</span></span>
+                <a href="Panel_1.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al Panel
+                </a>
+                <a href="#" class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de herramientas -->
+    <nav class="toolbar">
+        <div class="toolbar-content">
+            <div class="toolbar-title">
+                <h2>Gestión de Cuentas por Pagar</h2>
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-primary" onclick="abrirGestionIngresos()">
+                    <i class="fas fa-chart-line"></i> Gestión de Ingresos
+                </button>
+                <button class="btn btn-outline" onclick="abrirGestionTarifas()">
+                    <i class="fas fa-dollar-sign"></i> Gestionar Tarifas
+                </button>
+                <button class="btn btn-success" onclick="abrirGestionBancoDinero()">
+                    <i class="fas fa-university"></i> Banco de Dinero
+                </button>
+                <button class="btn btn-info" onclick="verHistorialPagos()">
+                    <i class="fas fa-history"></i> Historial de Pagos
+                </button>
+                <button class="btn btn-success" onclick="exportarDatos()" title="Exportar tabla completa a Excel">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Filtros y Estadísticas -->
+        <div class="filters-stats-container">
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label for="filtroOcupacion">Ocupación:</label>
+                    <select id="filtroOcupacion" onchange="aplicarFiltros()">
+                        <option value="">Todas las ocupaciones</option>
+                        <option value="JEFE DE AREA">JEFE DE AREA</option>
+                        <option value="PROFESOR COMPLEMENTARIO">PROFESOR COMPLEMENTARIO</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtroEstado">Estado de Pago:</label>
+                    <select id="filtroEstado" onchange="aplicarFiltros()">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagado">Pagado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtroMes">Mes:</label>
+                    <select id="filtroMes" onchange="aplicarFiltroMes()">
+                        <option value="">Cargando meses...</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline" onclick="limpiarFiltros()">
+                    <i class="fas fa-eraser"></i> Limpiar Filtros
+                </button>
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalPendiente">$0</div>
+                        <div class="stat-label">Total Pendiente</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalPagado">$0</div>
+                        <div class="stat-label">Total Pagado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Cuentas -->
+        <div class="tabla-cuentas-container">
+            <div class="tabla-header">
+                <h3>Lista de Cuentas por Pagar</h3>
+                <div class="tabla-info">
+                    <span id="totalRegistros">0 registros</span>
+                </div>
+            </div>
+            
+            <div class="tabla-wrapper">
+                    <table class="tabla-cuentas">
+                        <thead>
+                            <tr>
+                                <!-- Los encabezados se generarán dinámicamente -->
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCuentasBody">
+                            <!-- Los datos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Nueva/Editar Cuenta -->
+    <div id="modalCuenta" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalCuenta">Nueva Cuenta por Pagar</h3>
+                <button class="close-btn" onclick="cerrarModalCuenta()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formCuenta" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ocupacionPre">Ocupación en el PRE:</label>
+                        <select id="ocupacionPre" required>
+                            <option value="">Seleccionar ocupación</option>
+                            <option value="JEFE DE AREA">JEFE DE AREA</option>
+                            <option value="PROFESOR COMPLEMENTARIO">PROFESOR COMPLEMENTARIO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="asignaturaCuenta">Asignatura:</label>
+                        <select id="asignaturaCuenta" required>
+                            <option value="">Seleccionar asignatura</option>
+                            <option value="MTS">Matemáticas (MTS)</option>
+                            <option value="LC">Lectura y Comprensión (LC)</option>
+                            <option value="CS">Ciencias Sociales (CS)</option>
+                            <option value="ING">Inglés (ING)</option>
+                            <option value="CN">Ciencias Naturales (CN)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombreQuienRecibeCuenta">Nombre de Quién Recibe:</label>
+                        <input type="text" id="nombreQuienRecibeCuenta" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoBancoCuenta">Tipo de Banco:</label>
+                        <select id="tipoBancoCuenta" required>
+                            <option value="">Seleccionar banco</option>
+                            <option value="NEQUI">NEQUI</option>
+                            <option value="DAVIPLATA">DAVIPLATA</option>
+                            <option value="BANCOLOMBIA">BANCOLOMBIA</option>
+                            <option value="BANCO DE BOGOTÁ">BANCO DE BOGOTÁ</option>
+                            <option value="BANCO POPULAR">BANCO POPULAR</option>
+                            <option value="BBVA COLOMBIA">BBVA COLOMBIA</option>
+                            <option value="BANCO DAVIVIENDA">BANCO DAVIVIENDA</option>
+                            <option value="BANCO CAJA SOCIAL">BANCO CAJA SOCIAL</option>
+                            <option value="BANCO AGRARIO">BANCO AGRARIO</option>
+                            <option value="BANCO AV VILLAS">BANCO AV VILLAS</option>
+                            <option value="BANCO FALABELLA">BANCO FALABELLA</option>
+                            <option value="BANCO PICHINCHA">BANCO PICHINCHA</option>
+                            <option value="SCOTIABANK COLPATRIA">SCOTIABANK COLPATRIA</option>
+                            <option value="EFECTIVO">EFECTIVO</option>
+                            <option value="OTRO">OTRO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipoIdCuenta">Tipo de ID:</label>
+                        <select id="tipoIdCuenta" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="CÉDULA DE CIUDADANÍA">CÉDULA DE CIUDADANÍA</option>
+                            <option value="CÉDULA DE EXTRANJERÍA">CÉDULA DE EXTRANJERÍA</option>
+                            <option value="TARJETA DE IDENTIDAD">TARJETA DE IDENTIDAD</option>
+                            <option value="PASAPORTE">PASAPORTE</option>
+                            <option value="REGISTRO CIVIL">REGISTRO CIVIL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroIdCuenta">Número de ID:</label>
+                        <input type="text" id="numeroIdCuenta" placeholder="Número de identificación" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numeroCuentaCuenta">Número de Cuenta:</label>
+                        <input type="text" id="numeroCuentaCuenta" placeholder="Número de cuenta bancaria" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreCuentaCuenta">Nombre de Cuenta:</label>
+                        <input type="text" id="nombreCuentaCuenta" placeholder="Nombre titular de la cuenta" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="montoS1">Monto S1 (21/27 ABRIL):</label>
+                        <input type="number" id="montoS1" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="montoS2">Monto S2 (28/4 ABRIL A MAYO):</label>
+                        <input type="number" id="montoS2" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estadoPago">Estado de Pago:</label>
+                        <select id="estadoPago" required>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="pagado">Pagado</option>
+                            <option value="vencido">Vencido</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaVencimiento">Fecha de Vencimiento:</label>
+                        <input type="date" id="fechaVencimiento">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="observaciones">Observaciones:</label>
+                    <textarea id="observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalCuenta()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Gestionar Tarifas -->
+    <div id="modalTarifas" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalTarifas">Gestionar Tarifas por Hora</h3>
+                <button class="close-btn" onclick="cerrarModalTarifas()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-tarifas">
+                    <p><i class="fas fa-info-circle"></i> Configura la tarifa por hora de cada profesor. Los montos se calcularán automáticamente basándose en las horas trabajadas.</p>
+                </div>
+                <div id="listaTarifas" class="lista-tarifas">
+                    <!-- Las tarifas se cargarán dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalTarifas()">
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="guardarTodasLasTarifas()">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Realizar Pago -->
+    <div id="modalPago" class="modal">
+        <div class="modal-content modal-pago">
+            <div class="modal-header">
+                <h3>Realizar Pago</h3>
+                <button class="close-btn" onclick="cerrarModalPago()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formPago" class="modal-body" onsubmit="event.preventDefault(); procesarPago();">
+                <div class="pago-info">
+                    <div class="info-profesor">
+                        <h4>Información del Pago</h4>
+                        <div class="pago-detalle">
+                            <span class="detalle-label">Profesor:</span>
+                            <span class="detalle-valor" id="pagoProfesorNombre">-</span>
+                        </div>
+                        <div class="pago-detalle">
+                            <span class="detalle-label">Semana:</span>
+                            <span class="detalle-valor" id="pagoSemana">-</span>
+                        </div>
+                        <div class="pago-detalle">
+                            <span class="detalle-label">Monto:</span>
+                            <span class="detalle-valor monto-pago" id="pagoMonto">$0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bancoOrigen">Banco de Origen del Pago:</label>
+                    <select id="bancoOrigen" name="bancoOrigen" required>
+                        <option value="">Seleccionar banco de origen</option>
+                    </select>
+                </div>
+
+                <div id="infoSaldoSeleccionado" class="info-saldo" style="display: none;">
+                    <!-- Se llena dinámicamente -->
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcionPago">Descripción (Opcional):</label>
+                    <textarea id="descripcionPago" name="descripcionPago" rows="3" placeholder="Descripción adicional del pago..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="archivoComprobante">Comprobante de Pago:</label>
+                    <input type="file" id="archivoComprobante" name="archivoComprobante" accept="image/*" onchange="manejarArchivoComprobante(this)" required>
+                    <small class="archivo-info">Sube una imagen del comprobante de pago (máximo 5MB)</small>
+                </div>
+
+                <div id="previewComprobante" class="preview-comprobante" style="display: none;">
+                    <h5>Vista previa:</h5>
+                    <img src="" alt="Preview del comprobante" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+
+                <div id="comprobanteSubido" class="comprobante-subido" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Comprobante subido exitosamente</span>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalPago()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-credit-card"></i> Realizar Pago
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Gestión de Banco de Dinero -->
+    <div id="modalBancoDinero" class="modal">
+        <div class="modal-content modal-banco">
+            <div class="modal-header">
+                <h3>Gestión de Banco de Dinero</h3>
+                <button class="close-btn" onclick="cerrarModalBancoDinero()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formBancoDinero" class="modal-body" onsubmit="event.preventDefault(); guardarBancoDinero();">
+                <div class="info-banco">
+                    <p><i class="fas fa-info-circle"></i> Configura el dinero disponible en cada banco para realizar pagos.</p>
+                </div>
+                <div id="formularioBancoDinero">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalBancoDinero()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Historial de Pagos -->
+    <div id="modalHistorialPagos" class="modal">
+        <div class="modal-content modal-historial">
+            <div class="modal-header">
+                <h3>Historial de Pagos</h3>
+                <button class="close-btn" onclick="cerrarModalHistorial()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="listaHistorialPagos">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalHistorial()">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay del modal -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <!-- Scripts -->
+    <!-- SheetJS para exportar a Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <script src="../Componentes/js/config.js"></script>
+    <script>
+        // Inicializar Firebase cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+    </script>
+    <script src="../Componentes/js/cuentas-pagar.js"></script>
+    <script src="../Componentes/js/pagos-sistema.js"></script>
+</body>
+</html>

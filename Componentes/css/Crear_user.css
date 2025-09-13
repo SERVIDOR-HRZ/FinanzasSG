@@ -1,0 +1,373 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #000000 0%, #333333 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.register-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 100%;
+    max-width: 450px;
+    margin: 20px;
+}
+
+/* Diseño para PC/Desktop */
+@media (min-width: 1024px) {
+    .register-container {
+        max-width: 900px;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .form-group.half-width {
+        grid-column: span 2;
+    }
+}
+
+/* Diseño para tablets */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .register-container {
+        max-width: 700px;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+}
+
+.register-header {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.register-header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: 300;
+}
+
+.register-header p {
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.register-form {
+    padding: 40px 30px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #dc2626;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.materias-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.materias-container label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.materias-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.roles-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e5e5e5;
+}
+
+.roles-container label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 0;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.roles-container label:hover {
+    background-color: #e9ecef;
+}
+
+.roles-container input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.form-help {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-container input {
+    padding-right: 50px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+    transition: color 0.3s ease;
+    padding: 5px;
+}
+
+.password-toggle:hover {
+    color: #dc2626;
+}
+
+.password-toggle:focus {
+    outline: none;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.register-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+}
+
+.register-btn:active {
+    transform: translateY(0);
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-link a {
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: #991b1b;
+    text-decoration: underline;
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #dc2626;
+    display: none;
+}
+
+.success-message {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #16a34a;
+    display: none;
+}
+
+.password-requirements {
+    background: #f3f4f6;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+.password-requirements ul {
+    margin-left: 15px;
+    margin-top: 5px;
+}
+
+/* Responsive Design para móviles */
+@media (max-width: 767px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+        min-height: auto;
+    }
+
+    .register-container {
+        margin: 0;
+        border-radius: 10px;
+        max-width: 100%;
+    }
+
+    .register-header {
+        padding: 20px 15px;
+    }
+
+    .register-header h1 {
+        font-size: 22px;
+    }
+
+    .register-form {
+        padding: 25px 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .register-btn {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    .materias-container {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .roles-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .password-requirements {
+        padding: 12px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-header {
+        padding: 18px 12px;
+    }
+
+    .register-header h1 {
+        font-size: 20px;
+    }
+
+    .register-form {
+        padding: 20px 15px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 320px) {
+    .register-header h1 {
+        font-size: 18px;
+    }
+
+    .register-form {
+        padding: 15px 10px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+}
